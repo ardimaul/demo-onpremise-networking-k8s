@@ -1,0 +1,60 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 10m0s
+  chart:
+    spec:
+      reconcileStrategy: ChartVersion
+      chart: ./helmcharts/cilium/cilium
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  values:
+    autoDirectNodeRoutes: true
+    bpf:
+      masquerade: true
+    encryption:
+      enabled: false
+    hubble:
+      enabled: true
+      metrics:
+        enabled:
+        - dns:query;ignoreAAAA
+        - drop
+        - tcp
+        - flow
+        - icmp
+        - http
+      relay:
+        enabled: true
+      ui:
+        enabled: true
+        ingress:
+          enabled: true
+          hosts:
+          - hubble.k8s.io
+        replicas: 1
+    ipMasqAgent:
+      enabled: true
+    ipam:
+      mode: kubernetes
+      operator:
+        clusterPoolIPv4PodCIDR: 10.42.0.0/16
+    ipv4NativeRoutingCIDR: 10.42.0.0/16
+    k8s:
+      requireIPv4PodCIDR: true
+    # Kubernetes api IP, in this case i'm using VIP (Virtual IP)
+    k8sServiceHost: 192.168.151.50
+    k8sServicePort: 6443
+    kubeProxyReplacement: strict
+    l7Proxy: false
+    loadBalancer:
+      acceleration: native
+      mode: dsr
+    operator:
+      replicas: 1
+    tunnel: disabled

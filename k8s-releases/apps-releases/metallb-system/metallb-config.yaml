@@ -1,0 +1,20 @@
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: fancy-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.152.100-192.168.152.200
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: fancy-l2adv
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - fancy-pool
+  interfaces:
+  - ens4
